@@ -6,5 +6,5 @@ import org.course_planner.payment_service.dto.GeneratePaymentLinkResponse;
 public interface PaymentService {
     GeneratePaymentLinkResponse getPaymentLink(GeneratePaymentLinkRequest request);
 
-    void updatePaymentStatus(String paymentId, String paymentStatus);
+    void updatePaymentStatus(Object request);
 }

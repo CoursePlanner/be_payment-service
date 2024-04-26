@@ -4,14 +4,19 @@ server:
     context-path: "/api/payment-service"
 
 cp:
+  multi-thread-configs:
+    payment-link-event-hook:
+      thread-pool-size: 10
+      thread-timeout-ms: 5000
   razor-pay:
-    key-id: ${RP_KEY_ID:some-key}
-    key-secret: ${RP_KEY_SECRET:some-secret}
+    key-id: ${RP_KEY_ID:sample-key-id}
+    key-secret: ${RP_KEY_SECRET:sample-key-secret}
     enable-logging: false
     payment-link-expiry-minutes: 5
     call-back-url: ""
     notify-email: false
     notify-sms: false
+    web-hook-secret: ${RP_WEB_HOOK_SECRET:sample-webhook-secret}
 
 spring:
   datasource:
@@ -22,8 +27,25 @@ spring:
     hikari:
   jpa:
     hibernate:
-      ddl-auto: update
+      ddl-auto: create
     show-sql: true
+  kafka:
+    bootstrap-servers: ${KAFKA_BOOTSTRAP_SERVERS:localhost:9092}
+    consumer:
+      group-id: "cp-payment-service"
+      auto-offset-reset: earliest
+      key-deserializer: org.apache.kafka.common.serialization.StringDeserializer
+      value-deserializer: org.apache.kafka.common.serialization.StringDeserializer
+      properties:
+        max:
+          poll:
+            interval:
+              ms: 60000
+            records: 1
+    producer:
+      batch-size: 10
+      key-serializer: org.apache.kafka.common.serialization.StringSerializer
+      value-serializer: org.apache.kafka.common.serialization.StringSerializer
 
 logging:
   level:
